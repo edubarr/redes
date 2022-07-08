@@ -15,7 +15,7 @@ if len(sys.argv) != 1 and len(sys.argv) != 3:
     exit()
 
 elif len(sys.argv) == 1:
-    print("Sem IP e Porta personalizados, iniciando em 127.0.0.1:3100")
+    print("Sem IP e Porta personalizados teste você será, iniciando em 127.0.0.1:3100")
     ip_addr = "127.0.0.1"
     port = 3100
 
@@ -31,36 +31,46 @@ server.bind((ip_addr, port))
 """
 Servidor aguarda por 2 conexões
 """
-server.listen(2)
+server.listen(100)
 
 clients = []
 
 # Executa cada thread dos clientes
 def clientthread(conn, addr):
     
-    if conn == clients[0]:
-        welcome = "1 - Bem vindo ao jogo da velha! Você será o Jogador 1! Seu símbolo é o O! Aguarde o Jogador 2 se conectar!"
-    elif conn == clients[1]:
-        welcome = "2 - Bem vindo ao jogo da velha! Você será o Jogador 2! Seu símbolo é o X! O jogo já vai começar!"
-        
-        connect_warn = "Jogador 2 conectado! O jogo já vai começar!"
-        clients[0].send(connect_warn.encode())
-        
-    # Envia uma mensagem de boas vindas
-    conn.send(welcome.encode())
+    with conn:
+        if conn == clients[0]:
+            welcome = "1 - Bem vindo ao jogo da velha! Você será o Jogador 1! Seu símbolo é o O! Aguarde o Jogador 2 se conectar!"
+        elif conn == clients[1]:
+            welcome = "2 - Bem vindo ao jogo da velha! Você será o Jogador 2! Seu símbolo é o X! O jogo já vai começar!"
+            
+            connect_warn = "Jogador 2 conectado! O jogo já vai começar!"
+            clients[0].send(connect_warn.encode())
+            print("Jogadores conectados. Começando jogo...")
+            
+        # Envia uma mensagem de boas vindas
+        conn.sendall(welcome.encode())
     
-    while True:
-        try:
-            play = conn.recv(2048)
-            #if not play: break
-            if play:
-
+        while True:
+            try:
+                data = conn.recv(2048)
+                
+                if not data:
+                    print("Erro de conexão! Encerrando...")
+                    break
+                
+                play = data.decode('UTF-8')
+                
+                play = "jg" + play
+                
                 if conn == clients[0]:
-                    clients[1].send(play)
+                    clients[1].sendall(play.encode())
+                    print("Jogada recebida do Jogador 1, enviando para Jogador 2...")
                 else:
-                    clients[0].send(play)
-        except:
-            continue
+                    clients[0].sendall(play.encode())
+                    print("Jogada recebida do Jogador 2, enviando para Jogador 1...")
+            except:
+                continue
 
 while True:
 
@@ -71,10 +81,7 @@ while True:
     clients.append(conn)
 
     # Printa o endereço de quem conectou
-    print(addr[0] + " connected")
+    print(addr[0] + " conectado")
 
     # Cria uma thread para cada cliente
     start_new_thread(clientthread, (conn, addr))
-
-conn.close()
-server.close()
