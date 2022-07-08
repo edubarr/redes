@@ -1,8 +1,9 @@
 import socket
 import sys
 
-# start g
-
+"""
+Classe do jogo da velha
+"""
 class JogoDaVelha:
     tabuleiro = {
         "1": "-",
@@ -70,8 +71,6 @@ class JogoDaVelha:
         self.tabuleiro[jogada] = simbolo
 
 
-# finish g
-
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 if len(sys.argv) != 3:
     print("Uso correto: 'python client.py ip_addr port")
@@ -80,7 +79,7 @@ ip_addr = str(sys.argv[1])
 port = int(sys.argv[2])
 server.connect((ip_addr, port))
 
-welcome = server.recv(2048).decode('UTF-8')
+welcome = server.recv(2048).decode("UTF-8")
 
 print(welcome)
 
@@ -112,7 +111,7 @@ if player == 2:
 
 while True:
 
-    data = server.recv(2048).decode('UTF-8')
+    data = server.recv(2048).decode("UTF-8")
 
     if data.startswith("Jogador"):
         print(data)
@@ -126,7 +125,7 @@ while True:
         your_turn = True
 
         print("O adversário jogou!\n")
-        
+
         game.exibir_tabuleiro()
 
         estado = game.verificar_tabuleiro()
@@ -158,11 +157,11 @@ while True:
 
         game.jogar(play, symbol)
         your_turn = False
-        
+
         server.sendall(play.encode())
 
         game.exibir_tabuleiro()
-        
+
         estado = game.verificar_tabuleiro()
 
         if estado == "O":
@@ -174,5 +173,5 @@ while True:
         elif estado == "empate":
             print("Deu velha!!!")
             break
-        
+
         print("Aguardando adversário jogar...")

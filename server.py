@@ -37,32 +37,32 @@ clients = []
 
 # Executa cada thread dos clientes
 def clientthread(conn, addr):
-    
+
     with conn:
         if conn == clients[0]:
             welcome = "1 - Bem vindo ao jogo da velha! Você será o Jogador 1! Seu símbolo é o O! Aguarde o Jogador 2 se conectar!"
         elif conn == clients[1]:
             welcome = "2 - Bem vindo ao jogo da velha! Você será o Jogador 2! Seu símbolo é o X! O jogo já vai começar!"
-            
+
             connect_warn = "Jogador 2 conectado! O jogo já vai começar!"
             clients[0].send(connect_warn.encode())
             print("Jogadores conectados. Começando jogo...")
-            
+
         # Envia uma mensagem de boas vindas
         conn.sendall(welcome.encode())
-    
+
         while True:
             try:
                 data = conn.recv(2048)
-                
+
                 if not data:
                     print("Erro de conexão! Encerrando...")
                     break
-                
-                play = data.decode('UTF-8')
-                
+
+                play = data.decode("UTF-8")
+
                 play = "jg" + play
-                
+
                 if conn == clients[0]:
                     clients[1].sendall(play.encode())
                     print("Jogada recebida do Jogador 1, enviando para Jogador 2...")
@@ -71,6 +71,7 @@ def clientthread(conn, addr):
                     print("Jogada recebida do Jogador 2, enviando para Jogador 1...")
             except:
                 continue
+
 
 while True:
 
