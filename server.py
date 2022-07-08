@@ -39,9 +39,12 @@ clients = []
 def clientthread(conn, addr):
     
     if conn == clients[0]:
-        welcome = "Bem vindo ao jogo da velha! Seu símbolo é o X!"
+        welcome = "1 - Bem vindo ao jogo da velha! Você será o Jogador 1! Seu símbolo é o O! Aguarde o Jogador 2 se conectar!"
     elif conn == clients[1]:
-        welcome = "Bem vindo ao jogo da velha! Seu símbolo é o O!"
+        welcome = "2 - Bem vindo ao jogo da velha! Você será o Jogador 2! Seu símbolo é o X! O jogo já vai começar!"
+        
+        connect_warn = "Jogador 2 conectado! O jogo já vai começar!"
+        clients[0].send(connect_warn.encode())
         
     # Envia uma mensagem de boas vindas
     conn.send(welcome.encode())
